@@ -99,7 +99,7 @@ app.post("/send-invoice", async (req, res) => {
         for (const item of products) {
           const qty = item.quantity || 1;
           const rate = item.price || 0;
-          const discount = 0.05 * rate;
+          const discount = 0.10 * rate;
           const discountedRate = rate - discount;
           const lineTotal = qty * discountedRate;
           subtotal += lineTotal;
@@ -129,7 +129,7 @@ app.post("/send-invoice", async (req, res) => {
           doc.y = rowY + itemDescHeight + 2;
         }
 
-        const tax = subtotal * 0.05;
+        const tax = amount * 0.05;
         const total = subtotal + tax;
 
         doc.moveDown();
