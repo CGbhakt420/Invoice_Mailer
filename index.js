@@ -90,9 +90,9 @@ app.post("/send-invoice", async (req, res) => {
         doc.font("Helvetica-Bold");
         doc.text("Item", 50, startY, { width: 140 });
         doc.text("Qty", 250, startY, { width: 40, align: "center" });
-        doc.text("Rate", 290, startY, { width: 80, align: "right" });
-        doc.text("Discount", 370, startY, { width: 70, align: "right" });
-        doc.text("Amount", 440, startY, { width: 80, align: "right" });
+        doc.text("Rate", 290, startY, { width: 120, align: "center" });
+        // doc.text("Discount", 370, startY, { width: 70, align: "right" });
+        doc.text("Amount", 410, startY, { width: 80, align: "right" });
         doc.moveDown();
         doc.font("Helvetica");
         let subtotal = 0;
@@ -101,10 +101,10 @@ app.post("/send-invoice", async (req, res) => {
           const qty = item.quantity || 1;
           const rate = item.price || 0;
           totalRate += qty*rate;
-          const discount = 0.10 * rate;
-          const discountedRate = rate - discount;
-          const lineTotal = qty * discountedRate;
-          subtotal += lineTotal;
+          // const discount = 0.10 * rate;
+          // const discountedRate = rate - discount;
+          // const lineTotal = qty * discountedRate;
+          subtotal += totalRate;
 
           const itemDescOptions = { width: 140 };
           const itemDescHeight = doc.heightOfString(
@@ -115,15 +115,15 @@ app.post("/send-invoice", async (req, res) => {
 
           doc.text(item.description || "Item", 50, rowY, { width: 140 });
           doc.text(`${qty}`, 250, rowY, { width: 40, align: "center" });
-          doc.text(`₹${rate.toFixed(2)}`, 290, rowY, {
-            width: 80,
-            align: "right",
-          });
-          doc.text(`₹${discount.toFixed(2)}`, 370, rowY, {
-            width: 70,
+          doc.text(`Rs.${rate.toFixed(2)}`, 290, rowY, {
+            width: 120,
             align: "center",
           });
-          doc.text(`₹${lineTotal.toFixed(2)}`, 440, rowY, {
+          // doc.text(`₹${discount.toFixed(2)}`, 370, rowY, {
+          //   width: 70,
+          //   align: "center",
+          // });
+          doc.text(`Rs.${totalRate.toFixed(2)}`, 410, rowY, {
             width: 80,
             align: "right",
           });
@@ -132,13 +132,15 @@ app.post("/send-invoice", async (req, res) => {
         }
 
         const tax = totalRate * 0.05;
-        const total = subtotal + tax;
+        const discount = totalRate * 0.10;
+        const total = subtotal + tax - discount;
 
         doc.moveDown();
         doc.font("Helvetica-Bold");
-        doc.text(`Subtotal: ₹${subtotal.toFixed(2)}`, { align: "right" });
-        doc.text(`GST (5%): ₹${tax.toFixed(2)}`, { align: "right" });
-        doc.text(`Total: ₹${total.toFixed(2)}`, { align: "right" });
+        doc.text(`Subtotal: Rs.${subtotal.toFixed(2)}`, { align: "right" });
+        doc.text(`Discount (10%): Rs.${discount.toFixed(2)}`, { align: "right" });
+        doc.text(`GST (5%): Rs.${tax.toFixed(2)}`, { align: "right" });
+        doc.text(`Total: Rs.${total.toFixed(2)}`, { align: "right" });
 
         doc.moveDown(3);
         doc.font("Helvetica").fontSize(10);
